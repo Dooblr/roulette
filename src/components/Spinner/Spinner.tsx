@@ -1,41 +1,30 @@
 import { useEffect, useState } from 'react'
-import './Spinner.scss'
+import { motion } from 'framer-motion'
 import { useGameStore } from '../../stores/gameStore'
+import './Spinner.scss'
 
 function Spinner() {
   const { currentNumber } = useGameStore()
   const [rotation, setRotation] = useState(0)
-
-  const getNumberFromAngle = (angle: number) => {
-    // Normalize angle to 0-360
-    const normalizedAngle = angle % 360
-    // Each number takes up 360/37 degrees
-    const segmentSize = 360 / 37
-    // Calculate index in ROULETTE_NUMBERS
-    const index = Math.floor(normalizedAngle / segmentSize)
-    return ROULETTE_NUMBERS[index]
-  }
+  const [finalAngle, setFinalAngle] = useState<number | null>(null)
 
   useEffect(() => {
     const handleSpin = () => {
-      const spins = 4 // Reduced number of rotations
-      const duration = 6000 // Increased duration to 6 seconds
+      const spins = 4
+      const duration = 6000
       const startTime = performance.now()
       
       const animate = (currentTime: number) => {
         const elapsed = currentTime - startTime
         const progress = Math.min(elapsed / duration, 1)
         
-        // Ease out cubic function for smooth deceleration
         const easeOut = 1 - Math.pow(1 - progress, 3)
         const currentRotation = spins * 360 * easeOut
         
         setRotation(currentRotation)
         
-        // Calculate result when spin is complete
         if (progress === 1) {
-          const finalNumber = getNumberFromAngle(currentRotation)
-          setResult(finalNumber)
+          setFinalAngle(currentRotation % 360)
         }
         
         if (progress < 1) {
@@ -43,7 +32,7 @@ function Spinner() {
         }
       }
       
-      setResult(null) // Clear previous result
+      setFinalAngle(null)
       requestAnimationFrame(animate)
     }
 
@@ -62,18 +51,36 @@ function Spinner() {
   return (
     <>
       {currentNumber && (
-        <div 
+        <p 
           className="spinner-result"
           style={{ color: currentNumber.color }}
         >
-          Result: {currentNumber.value}
-        </div>
+          {currentNumber.value} 
+          {currentNumber.color.toUpperCase()}
+        </p>
       )}
       <div 
         className="spinner"
         style={{ transform: `translate(-50%, -50%) rotate(${rotation}deg)` }}
       >
-        <div className="spinner__inner"></div>
+        <div className="spinner__inner" />
+        {finalAngle !== null && (
+          <div 
+            className="spinner__indicator"
+            style={{ 
+              transform: `rotate(${finalAngle}deg)`,
+              backgroundColor: 'blue',
+              position: 'absolute',
+              width: '2px',
+              height: '50%',
+              left: 'calc(50% - 1px)',
+              top: '0',
+              transformOrigin: 'bottom center',
+              opacity: 0.7,
+              zIndex: 3
+            }}
+          />
+        )}
       </div>
     </>
   )

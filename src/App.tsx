@@ -99,7 +99,8 @@ function App() {
         setBallVelocity(newVel)
 
         if (inwardPhase && currentRadius <= stopRadius && Math.abs(currentVelocity) < 0.1) {
-          const finalNumber = findNumberByAngle(currentAngle)
+          const normalizedAngle = ((-currentAngle % 360) + 360) % 360
+          const finalNumber = findNumberByAngle(normalizedAngle)
           setCurrentNumber(finalNumber)
           setIsSpinning(false)
           return

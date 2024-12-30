@@ -72,8 +72,14 @@ export const findNumberByAngle = (angle: number): RouletteNumber => {
   
   // Find the closest number based on angle
   return ROULETTE_NUMBERS.reduce((closest, current) => {
-    const currentDiff = Math.abs(normalizedAngle - current.angle)
-    const closestDiff = Math.abs(normalizedAngle - closest.angle)
+    const currentDiff = Math.min(
+      Math.abs(normalizedAngle - current.angle),
+      Math.abs(normalizedAngle - (current.angle + 360))
+    )
+    const closestDiff = Math.min(
+      Math.abs(normalizedAngle - closest.angle),
+      Math.abs(normalizedAngle - (closest.angle + 360))
+    )
     return currentDiff < closestDiff ? current : closest
   }, ROULETTE_NUMBERS[0])
 } 
