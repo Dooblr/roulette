@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { useCollision } from './hooks/useCollision'
 import './App.scss'
+import Spinner from './components/Spinner/Spinner'
 
 interface Vector2D {
   x: number
@@ -117,6 +118,7 @@ function App() {
 
   return (
     <div className="app-container">
+      <Spinner />
       <div className="coordinate-system">
         <div className="circle">
           <motion.div 

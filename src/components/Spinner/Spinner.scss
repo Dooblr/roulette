@@ -1,0 +1,100 @@
+.spinner {
+  width: 250px;
+  height: 250px;
+  position: fixed;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: conic-gradient(
+    #D40000 0deg 10deg,
+    rgba(255, 255, 255, 0.3) 10deg 10.5deg,
+    #000000 10.5deg 20deg,
+    rgba(255, 255, 255, 0.3) 20deg 20.5deg,
+    #D40000 20.5deg 30deg,
+    rgba(255, 255, 255, 0.3) 30deg 30.5deg,
+    #000000 30.5deg 40deg,
+    rgba(255, 255, 255, 0.3) 40deg 40.5deg,
+    #D40000 40.5deg 50deg,
+    rgba(255, 255, 255, 0.3) 50deg 50.5deg,
+    #000000 50.5deg 60deg,
+    rgba(255, 255, 255, 0.3) 60deg 60.5deg,
+    #D40000 60.5deg 70deg,
+    rgba(255, 255, 255, 0.3) 70deg 70.5deg,
+    #000000 70.5deg 80deg,
+    rgba(255, 255, 255, 0.3) 80deg 80.5deg,
+    #D40000 80.5deg 90deg,
+    rgba(255, 255, 255, 0.3) 90deg 90.5deg,
+    #228B22 90.5deg 100deg,
+    rgba(255, 255, 255, 0.3) 100deg 100.5deg,
+    #228B22 100.5deg 110deg,
+    rgba(255, 255, 255, 0.3) 110deg 110.5deg,
+    #D40000 110.5deg 120deg,
+    rgba(255, 255, 255, 0.3) 120deg 120.5deg,
+    #000000 120.5deg 130deg,
+    rgba(255, 255, 255, 0.3) 130deg 130.5deg,
+    #D40000 130.5deg 140deg,
+    rgba(255, 255, 255, 0.3) 140deg 140.5deg,
+    #000000 140.5deg 150deg,
+    rgba(255, 255, 255, 0.3) 150deg 150.5deg,
+    #D40000 150.5deg 160deg,
+    rgba(255, 255, 255, 0.3) 160deg 160.5deg,
+    #000000 160.5deg 170deg,
+    rgba(255, 255, 255, 0.3) 170deg 170.5deg,
+    #D40000 170.5deg 180deg,
+    rgba(255, 255, 255, 0.3) 180deg 180.5deg,
+    #000000 180.5deg 190deg,
+    rgba(255, 255, 255, 0.3) 190deg 190.5deg,
+    #D40000 190.5deg 200deg,
+    rgba(255, 255, 255, 0.3) 200deg 200.5deg,
+    #000000 200.5deg 210deg,
+    rgba(255, 255, 255, 0.3) 210deg 210.5deg,
+    #D40000 210.5deg 220deg,
+    rgba(255, 255, 255, 0.3) 220deg 220.5deg,
+    #000000 220.5deg 230deg,
+    rgba(255, 255, 255, 0.3) 230deg 230.5deg,
+    #D40000 230.5deg 240deg,
+    rgba(255, 255, 255, 0.3) 240deg 240.5deg,
+    #000000 240.5deg 250deg,
+    rgba(255, 255, 255, 0.3) 250deg 250.5deg,
+    #D40000 250.5deg 260deg,
+    rgba(255, 255, 255, 0.3) 260deg 260.5deg,
+    #000000 260.5deg 270deg,
+    rgba(255, 255, 255, 0.3) 270deg 270.5deg,
+    #D40000 270.5deg 280deg,
+    rgba(255, 255, 255, 0.3) 280deg 280.5deg,
+    #000000 280.5deg 290deg,
+    rgba(255, 255, 255, 0.3) 290deg 290.5deg,
+    #D40000 290.5deg 300deg,
+    rgba(255, 255, 255, 0.3) 300deg 300.5deg,
+    #000000 300.5deg 310deg,
+    rgba(255, 255, 255, 0.3) 310deg 310.5deg,
+    #D40000 310.5deg 320deg,
+    rgba(255, 255, 255, 0.3) 320deg 320.5deg,
+    #000000 320.5deg 330deg,
+    rgba(255, 255, 255, 0.3) 330deg 330.5deg,
+    #D40000 330.5deg 340deg,
+    rgba(255, 255, 255, 0.3) 340deg 340.5deg,
+    #000000 340.5deg 350deg,
+    rgba(255, 255, 255, 0.3) 350deg 350.5deg,
+    #D40000 350.5deg 360deg
+  );
+  box-shadow: 
+    inset 0 0 50px rgba(0, 0, 0, 0.5),
+    0 0 30px rgba(0, 0, 0, 0.3);
+  border: 4px solid #333;
+}
+
+.spinner__inner {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 30px;
+  height: 30px;
+  background: radial-gradient(circle at center, #EEE, #888);
+  border-radius: 50%;
+  border: 2px solid #666;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+  z-index: 2;
+}
