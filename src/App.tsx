@@ -15,6 +15,7 @@ function App() {
   const [ballPosition, setBallPosition] = useState<Vector2D>({ x: 0, y: 0 })
   const [ballVelocity, setBallVelocity] = useState<Vector2D>({ x: 0, y: 0 })
   const ballRef = useRef<HTMLDivElement>(null)
+  const [bounceTarget, setBounceTarget] = useState<Vector2D | null>(null)
   
   const circleRadius = 375 / 2
   const stopRadius = circleRadius * 0.6
@@ -99,9 +100,24 @@ function App() {
         setBallVelocity(newVel)
 
         if (inwardPhase && currentRadius <= stopRadius && Math.abs(currentVelocity) < 0.1) {
-          const normalizedAngle = ((-currentAngle % 360) + 360) % 360
-          const finalNumber = findNumberByAngle(normalizedAngle)
-          setCurrentNumber(finalNumber)
+          const ballAngle = (Math.atan2(newPos.y, newPos.x) * 180 / Math.PI + 360) % 360
+          const { number: finalNumber, next, isExactlyBetween } = findNumberByAngle(ballAngle)
+          
+          let targetNumber = finalNumber
+          if (isExactlyBetween) {
+            targetNumber = Math.random() >= 0.5 ? next! : finalNumber
+          }
+          
+          setCurrentNumber(targetNumber)
+          
+          // Calculate bounce target to segment center
+          const targetAngle = targetNumber.angle * Math.PI / 180
+          const bouncePos = {
+            x: stopRadius * Math.cos(targetAngle),
+            y: stopRadius * Math.sin(targetAngle)
+          }
+          setBounceTarget(bouncePos)
+          
           setIsSpinning(false)
           return
         }
@@ -116,6 +132,42 @@ function App() {
       if (frameId) cancelAnimationFrame(frameId)
     }
   }, [isSpinning, handleCollision, stopRadius, chaosLevel, setCurrentNumber])
+
+  // Add bounce animation effect
+  useEffect(() => {
+    if (bounceTarget) {
+      const startPos = { ...ballPosition }
+      const startTime = performance.now()
+      const duration = 300 // 300ms bounce duration
+      
+      const animateBounce = (currentTime: number) => {
+        const elapsed = currentTime - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        
+        // Elastic easing function for bounce effect
+        const easeOutElastic = (x: number): number => {
+          const c4 = (2 * Math.PI) / 3
+          return x === 0 ? 0 : x === 1 ? 1 
+            : Math.pow(2, -10 * x) * Math.sin((x * 10 - 0.75) * c4) + 1
+        }
+        
+        const ease = easeOutElastic(progress)
+        
+        setBallPosition({
+          x: startPos.x + (bounceTarget.x - startPos.x) * ease,
+          y: startPos.y + (bounceTarget.y - startPos.y) * ease
+        })
+        
+        if (progress < 1) {
+          requestAnimationFrame(animateBounce)
+        } else {
+          setBounceTarget(null)
+        }
+      }
+      
+      requestAnimationFrame(animateBounce)
+    }
+  }, [bounceTarget])
 
   const startSpin = () => {
     setBallPosition({ 

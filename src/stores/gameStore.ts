@@ -17,43 +17,43 @@ interface GameState {
 
 // Standard roulette wheel sequence with colors and positions
 export const ROULETTE_NUMBERS: RouletteNumber[] = [
-  { value: 0, color: 'green', angle: 0 },
-  { value: 32, color: 'red', angle: 9.73 },
-  { value: 15, color: 'black', angle: 19.46 },
-  { value: 19, color: 'red', angle: 29.19 },
-  { value: 4, color: 'black', angle: 38.92 },
-  { value: 21, color: 'red', angle: 48.65 },
-  { value: 2, color: 'black', angle: 58.38 },
-  { value: 25, color: 'red', angle: 68.11 },
-  { value: 17, color: 'black', angle: 77.84 },
-  { value: 34, color: 'red', angle: 87.57 },
-  { value: 6, color: 'black', angle: 97.3 },
-  { value: 27, color: 'red', angle: 107.03 },
-  { value: 13, color: 'black', angle: 116.76 },
-  { value: 36, color: 'red', angle: 126.49 },
-  { value: 11, color: 'black', angle: 136.22 },
-  { value: 30, color: 'red', angle: 145.95 },
-  { value: 8, color: 'black', angle: 155.68 },
-  { value: 23, color: 'red', angle: 165.41 },
-  { value: 10, color: 'black', angle: 175.14 },
-  { value: 5, color: 'red', angle: 184.87 },
-  { value: 24, color: 'black', angle: 194.6 },
-  { value: 16, color: 'red', angle: 204.33 },
-  { value: 33, color: 'black', angle: 214.06 },
-  { value: 1, color: 'red', angle: 223.79 },
-  { value: 20, color: 'black', angle: 233.52 },
-  { value: 14, color: 'red', angle: 243.25 },
-  { value: 31, color: 'black', angle: 252.98 },
-  { value: 9, color: 'red', angle: 262.71 },
-  { value: 22, color: 'black', angle: 272.44 },
-  { value: 18, color: 'red', angle: 282.17 },
-  { value: 29, color: 'black', angle: 291.9 },
-  { value: 7, color: 'red', angle: 301.63 },
-  { value: 28, color: 'black', angle: 311.36 },
-  { value: 12, color: 'red', angle: 321.09 },
-  { value: 35, color: 'black', angle: 330.82 },
-  { value: 3, color: 'red', angle: 340.55 },
-  { value: 26, color: 'black', angle: 350.28 }
+  { value: 0, color: 'green', angle: 95 },      // Center of segment (90-100)
+  { value: 32, color: 'red', angle: 105 },      // Center of segment (100-110)
+  { value: 15, color: 'black', angle: 115 },
+  { value: 19, color: 'red', angle: 125 },
+  { value: 4, color: 'black', angle: 135 },
+  { value: 21, color: 'red', angle: 145 },
+  { value: 2, color: 'black', angle: 155 },
+  { value: 25, color: 'red', angle: 165 },
+  { value: 17, color: 'black', angle: 175 },
+  { value: 34, color: 'red', angle: 185 },
+  { value: 6, color: 'black', angle: 195 },
+  { value: 27, color: 'red', angle: 205 },
+  { value: 13, color: 'black', angle: 215 },
+  { value: 36, color: 'red', angle: 225 },
+  { value: 11, color: 'black', angle: 235 },
+  { value: 30, color: 'red', angle: 245 },
+  { value: 8, color: 'black', angle: 255 },
+  { value: 23, color: 'red', angle: 265 },
+  { value: 10, color: 'black', angle: 275 },
+  { value: 5, color: 'red', angle: 285 },
+  { value: 24, color: 'black', angle: 295 },
+  { value: 16, color: 'red', angle: 305 },
+  { value: 33, color: 'black', angle: 315 },
+  { value: 1, color: 'red', angle: 325 },
+  { value: 20, color: 'black', angle: 335 },
+  { value: 14, color: 'red', angle: 345 },
+  { value: 31, color: 'black', angle: 355 },
+  { value: 9, color: 'red', angle: 5 },
+  { value: 22, color: 'black', angle: 15 },
+  { value: 18, color: 'red', angle: 25 },
+  { value: 29, color: 'black', angle: 35 },
+  { value: 7, color: 'red', angle: 45 },
+  { value: 28, color: 'black', angle: 55 },
+  { value: 12, color: 'red', angle: 65 },
+  { value: 35, color: 'black', angle: 75 },
+  { value: 3, color: 'red', angle: 85 },
+  { value: 26, color: 'black', angle: 95 }
 ]
 
 export const useGameStore = create<GameState>((set) => ({
@@ -66,20 +66,35 @@ export const useGameStore = create<GameState>((set) => ({
 }))
 
 // Helper function to find the closest number to a given angle
-export const findNumberByAngle = (angle: number): RouletteNumber => {
-  // Normalize angle to 0-360
+export const findNumberByAngle = (angle: number): { 
+  number: RouletteNumber, 
+  next?: RouletteNumber, 
+  isExactlyBetween: boolean 
+} => {
   const normalizedAngle = ((angle % 360) + 360) % 360
   
-  // Find the closest number based on angle
-  return ROULETTE_NUMBERS.reduce((closest, current) => {
-    const currentDiff = Math.min(
-      Math.abs(normalizedAngle - current.angle),
-      Math.abs(normalizedAngle - (current.angle + 360))
-    )
-    const closestDiff = Math.min(
-      Math.abs(normalizedAngle - closest.angle),
-      Math.abs(normalizedAngle - (closest.angle + 360))
-    )
-    return currentDiff < closestDiff ? current : closest
-  }, ROULETTE_NUMBERS[0])
+  // Find segment boundaries (each segment is 10 degrees)
+  const segmentIndex = Math.floor(normalizedAngle / 10)
+  const segmentStart = segmentIndex * 10
+  const segmentMiddle = segmentStart + 5
+  const segmentEnd = segmentStart + 10
+  
+  // Find numbers in current and adjacent segments
+  const currentNumber = ROULETTE_NUMBERS.find(n => 
+    Math.abs(n.angle - segmentMiddle) < 5
+  )!
+  
+  const nextSegmentMiddle = ((segmentMiddle + 10) % 360)
+  const nextNumber = ROULETTE_NUMBERS.find(n => 
+    Math.abs(n.angle - nextSegmentMiddle) < 5
+  )!
+  
+  // Check if exactly between segments
+  const isExactlyBetween = Math.abs(normalizedAngle - segmentEnd) < 0.1
+
+  return {
+    number: currentNumber,
+    next: isExactlyBetween ? nextNumber : undefined,
+    isExactlyBetween
+  }
 } 

@@ -68,7 +68,7 @@ function Spinner() {
           <div 
             className="spinner__indicator"
             style={{ 
-              transform: `rotate(${finalAngle}deg)`,
+              transform: `rotate(${finalAngle + 90}deg)`,
               backgroundColor: 'blue',
               position: 'absolute',
               width: '2px',
