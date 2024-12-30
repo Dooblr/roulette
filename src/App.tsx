@@ -3,6 +3,7 @@ import { motion } from 'framer-motion'
 import { useCollision } from './hooks/useCollision'
 import './App.scss'
 import Spinner from './components/Spinner/Spinner'
+import { useGameStore, findNumberByAngle } from './stores/gameStore'
 
 interface Vector2D {
   x: number
@@ -15,9 +16,9 @@ function App() {
   const [ballVelocity, setBallVelocity] = useState<Vector2D>({ x: 0, y: 0 })
   const ballRef = useRef<HTMLDivElement>(null)
   
-  const circleRadius = 150
+  const circleRadius = 375 / 2
   const stopRadius = circleRadius * 0.6
-  const startRadius = circleRadius - 10
+  const startRadius = circleRadius - 12.5
   const initialRevolutions = 5
   const chaosLevel = 0.15
 
@@ -35,6 +36,8 @@ function App() {
     const randomFactor = (Math.random() * 2 - 1) * chaosLevel
     return value * (1 + randomFactor * maxDeviation)
   }
+
+  const { setCurrentNumber } = useGameStore()
 
   useEffect(() => {
     let frameId: number | null = null;
@@ -96,6 +99,8 @@ function App() {
         setBallVelocity(newVel)
 
         if (inwardPhase && currentRadius <= stopRadius && Math.abs(currentVelocity) < 0.1) {
+          const finalNumber = findNumberByAngle(currentAngle)
+          setCurrentNumber(finalNumber)
           setIsSpinning(false)
           return
         }
@@ -109,10 +114,13 @@ function App() {
     return () => {
       if (frameId) cancelAnimationFrame(frameId)
     }
-  }, [isSpinning, handleCollision, stopRadius, chaosLevel])
+  }, [isSpinning, handleCollision, stopRadius, chaosLevel, setCurrentNumber])
 
   const startSpin = () => {
-    setBallPosition({ x: startRadius, y: 0 })
+    setBallPosition({ 
+      x: startRadius * Math.cos(0), 
+      y: startRadius * Math.sin(0)
+    })
     setIsSpinning(true)
   }
 

@@ -1,15 +1,10 @@
 import { useEffect, useState } from 'react'
 import './Spinner.scss'
-
-// Roulette wheel number sequence
-const ROULETTE_NUMBERS = [
-  0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5,
-  24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26
-]
+import { useGameStore } from '../../stores/gameStore'
 
 function Spinner() {
+  const { currentNumber } = useGameStore()
   const [rotation, setRotation] = useState(0)
-  const [result, setResult] = useState<number | null>(null)
 
   const getNumberFromAngle = (angle: number) => {
     // Normalize angle to 0-360
@@ -66,9 +61,12 @@ function Spinner() {
 
   return (
     <>
-      {result !== null && (
-        <div className="spinner-result">
-          Result: {result}
+      {currentNumber && (
+        <div 
+          className="spinner-result"
+          style={{ color: currentNumber.color }}
+        >
+          Result: {currentNumber.value}
         </div>
       )}
       <div 
