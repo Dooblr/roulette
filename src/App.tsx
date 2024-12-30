@@ -14,31 +14,75 @@ function App() {
   const [ballVelocity, setBallVelocity] = useState<Vector2D>({ x: 0, y: 0 })
   const ballRef = useRef<HTMLDivElement>(null)
   
+  const circleRadius = 150
+  const stopRadius = circleRadius * 0.6
+  const startRadius = circleRadius - 10
+  const initialRevolutions = 5
+  const chaosLevel = 0.15
+
+  // Randomize initial velocity between 12-18
+  const getInitialVelocity = () => 15 + (Math.random() * 6 - 3)
+  
   const handleCollision = useCollision({
-    circleRadius: 150,
+    circleRadius,
     ballRadius: 10,
     friction: 0.98,
     pullToCenter: 0.1
   })
 
+  const addChaos = (value: number, maxDeviation: number) => {
+    const randomFactor = (Math.random() * 2 - 1) * chaosLevel
+    return value * (1 + randomFactor * maxDeviation)
+  }
+
   useEffect(() => {
     let frameId: number | null = null;
-    let positionInterval: NodeJS.Timeout | null = null;
 
     if (isSpinning) {
       let currentAngle = 0;
-      let currentVelocity = 15;
-      let inwardPull = 0;
+      let baseVelocity = getInitialVelocity();
+      let currentVelocity = baseVelocity;
+      let currentRadius = startRadius;
+      let revolutionCount = 0;
+      let inwardPhase = false;
+      let lastUpdateTime = performance.now();
+      let spinDirection = Math.random() > 0.5 ? 1 : -1; // Random direction
 
-      const animate = () => {
-        currentAngle += currentVelocity
-        currentVelocity *= 0.997
-        inwardPull += 0.0001
+      const animate = (currentTime: number) => {
+        const deltaTime = (currentTime - lastUpdateTime) / 16.67;
+        lastUpdateTime = currentTime;
 
-        const radius = Math.max(140 - inwardPull * 1000, 30)
+        if (!inwardPhase) {
+          const previousRevs = Math.floor(revolutionCount);
+          revolutionCount = Math.abs(currentAngle / 360);
+          
+          // More pronounced velocity variations during edge phase
+          currentVelocity = addChaos(baseVelocity, 0.3) * spinDirection;
+          
+          if (Math.floor(revolutionCount) > previousRevs && revolutionCount >= initialRevolutions) {
+            inwardPhase = true;
+          }
+        }
+
+        if (inwardPhase) {
+          const progress = Math.max(0, Math.min(1, 
+            (startRadius - currentRadius) / (startRadius - stopRadius)
+          ));
+
+          currentVelocity = addChaos(baseVelocity * (1 - Math.pow(progress, 2)), 0.3) * spinDirection;
+          
+          const baseRadiusDecrease = (startRadius - stopRadius) * 0.005;
+          const radiusDecrease = addChaos(baseRadiusDecrease, 0.4) * deltaTime;
+          currentRadius = Math.max(stopRadius, currentRadius - radiusDecrease);
+        }
+        
+        const angleIncrement = addChaos(currentVelocity, 0.15) * deltaTime;
+        currentAngle += angleIncrement;
+
+        const radiusVariation = addChaos(currentRadius, 0.05);
         const pos: Vector2D = {
-          x: Math.cos(currentAngle * Math.PI / 180) * radius,
-          y: Math.sin(currentAngle * Math.PI / 180) * radius
+          x: Math.cos(currentAngle * Math.PI / 180) * radiusVariation,
+          y: Math.sin(currentAngle * Math.PI / 180) * radiusVariation
         }
 
         const vel: Vector2D = {
@@ -50,28 +94,24 @@ function App() {
         setBallPosition(newPos)
         setBallVelocity(newVel)
 
-        if (currentVelocity > 0.1) {
-          frameId = requestAnimationFrame(animate)
-        } else {
+        if (inwardPhase && currentRadius <= stopRadius && Math.abs(currentVelocity) < 0.1) {
           setIsSpinning(false)
+          return
         }
+
+        frameId = requestAnimationFrame(animate)
       }
 
       frameId = requestAnimationFrame(animate)
-
-      // Optional: log position updates
-      positionInterval = setInterval(() => {
-        console.log(`Ball position: (${Math.round(ballPosition.x)}, ${Math.round(ballPosition.y)})`)
-      }, 100)
     }
 
     return () => {
       if (frameId) cancelAnimationFrame(frameId)
-      if (positionInterval) clearInterval(positionInterval)
     }
-  }, [isSpinning, handleCollision])
+  }, [isSpinning, handleCollision, stopRadius, chaosLevel])
 
   const startSpin = () => {
+    setBallPosition({ x: startRadius, y: 0 })
     setIsSpinning(true)
   }
 
