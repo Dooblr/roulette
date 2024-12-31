@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { ROULETTE_NUMBERS } from './gameStore'
 
 interface Bet {
   number: number
@@ -15,10 +16,12 @@ interface BettingState {
   removeBet: (number: number) => void
   handleWin: (winningNumber: number) => void
   clearBets: () => void
+  placeBetOnColor: (color: 'red' | 'black') => void
 }
 
 const PAYOUT_RATIOS = {
   single: 35, // 35 to 1 for single number
+  color: 1,   // 1 to 1 for color bets
 }
 
 export const useBettingStore = create<BettingState>((set, get) => ({
@@ -52,8 +55,15 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     }
   }),
   handleWin: (winningNumber) => set((state) => {
-    const winningBet = state.bets.find(bet => bet.number === winningNumber)
-    const totalWinnings = winningBet ? winningBet.amount * (PAYOUT_RATIOS.single + 1) : 0
+    const winningBets = state.bets.filter(bet => bet.number === winningNumber)
+    const totalWinnings = winningBets.reduce((sum, bet) => {
+      const isColorBet = state.bets.some(b => 
+        ROULETTE_NUMBERS.find(n => n.value === b.number)?.color === 
+        ROULETTE_NUMBERS.find(n => n.value === winningNumber)?.color
+      )
+      const ratio = isColorBet ? PAYOUT_RATIOS.color : PAYOUT_RATIOS.single
+      return sum + (bet.amount * (ratio + 1))
+    }, 0)
     
     return {
       playerMoney: state.playerMoney + totalWinnings,
@@ -63,5 +73,21 @@ export const useBettingStore = create<BettingState>((set, get) => ({
   clearBets: () => set((state) => ({
     bets: [],
     playerMoney: state.playerMoney + state.bets.reduce((sum, bet) => sum + bet.amount, 0)
-  }))
+  })),
+  placeBetOnColor: (color) => set((state) => {
+    const numbersOfColor = ROULETTE_NUMBERS.filter(n => n.color === color)
+    const totalBet = state.selectedBetAmount * numbersOfColor.length
+    
+    if (totalBet > state.playerMoney) return state
+    
+    const newBets = numbersOfColor.map(n => ({
+      number: n.value,
+      amount: state.selectedBetAmount
+    }))
+    
+    return {
+      bets: [...state.bets, ...newBets],
+      playerMoney: state.playerMoney - totalBet
+    }
+  })
 })) 

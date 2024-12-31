@@ -11,7 +11,8 @@ function BettingGrid() {
     setBetAmount, 
     placeBet,
     clearBets,
-    bets 
+    bets,
+    placeBetOnColor 
   } = useBettingStore()
 
   const formatMoney = (amount: number) => {
@@ -38,6 +39,20 @@ function BettingGrid() {
             </button>
           ))}
         </div>
+        <div className="betting-grid__colors">
+          <button 
+            className="betting-grid__color-btn betting-grid__color-btn--red"
+            onClick={() => placeBetOnColor('red')}
+          >
+            All Red
+          </button>
+          <button 
+            className="betting-grid__color-btn betting-grid__color-btn--black"
+            onClick={() => placeBetOnColor('black')}
+          >
+            All Black
+          </button>
+        </div>
         <button 
           className="betting-grid__clear-btn"
           onClick={clearBets}
@@ -47,6 +62,18 @@ function BettingGrid() {
         </button>
       </div>
       <div className="betting-grid__container">
+        <div
+          className={`betting-grid__cell betting-grid__cell--green`}
+          onClick={() => placeBet(-1)} // 00
+          style={{ backgroundColor: 'green', color: 'white' }}
+        >
+          <span>00</span>
+          {bets.find(bet => bet.number === -1) && (
+            <div className="betting-grid__coin">
+              ${bets.find(bet => bet.number === -1)?.amount}
+            </div>
+          )}
+        </div>
         {ROULETTE_NUMBERS
           .filter(num => num.value >= 0)
           .sort((a, b) => a.value - b.value)
