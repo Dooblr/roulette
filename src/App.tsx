@@ -5,6 +5,8 @@ import { useCollision } from './hooks/useCollision'
 import { findNumberByAngle, useGameStore } from './stores/gameStore'
 import Lines from './components/Lines/Lines'
 import ResultDisplay from './components/ResultDisplay/ResultDisplay'
+import BettingGrid from './components/BettingGrid/BettingGrid'
+import { useBettingStore } from './stores/bettingStore'
 
 interface Vector2D {
   x: number
@@ -40,6 +42,7 @@ function App() {
   }
 
   const { setCurrentNumber, setSpinRotation } = useGameStore()
+  const { handleWin } = useBettingStore()
 
   useEffect(() => {
     let frameId: number | null = null;
@@ -113,6 +116,7 @@ function App() {
           }
           
           setCurrentNumber(targetNumber)
+          handleWin(targetNumber.value)
           
           const targetAngle = (targetNumber.angle - 90) * Math.PI / 180
           const bouncePos = {
@@ -135,7 +139,7 @@ function App() {
     return () => {
       if (frameId) cancelAnimationFrame(frameId)
     }
-  }, [isSpinning, handleCollision, stopRadius, chaosLevel, setCurrentNumber, setSpinRotation])
+  }, [isSpinning, handleCollision, stopRadius, chaosLevel, setCurrentNumber, setSpinRotation, handleWin])
 
   // Add bounce animation effect
   useEffect(() => {
@@ -184,6 +188,7 @@ function App() {
   return (
     <div className="app-container">
       <ResultDisplay />
+      
       <div className="coordinate-system">
         <div className="circle">
           <Lines />
@@ -197,7 +202,9 @@ function App() {
           <div className="coordinates">
             ({Math.round(ballPosition.x)}, {Math.round(ballPosition.y)})
           </div>
+          
         </div>
+        
       </div>
       <button 
         className="spin-button"
@@ -206,6 +213,7 @@ function App() {
       >
         Spin
       </button>
+      <BettingGrid />
     </div>
   )
 }
