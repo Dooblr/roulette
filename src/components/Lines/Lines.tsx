@@ -1,9 +1,18 @@
+import { motion } from 'framer-motion'
 import { ROULETTE_NUMBERS } from '../../stores/gameStore'
+import { useGameStore } from '../../stores/gameStore'
 import './Lines.scss'
 
 function Lines() {
+  const { ballDirection, isSpinning, spinRotation } = useGameStore()
+
   return (
-    <div className="lines">
+    <motion.div 
+      className="lines"
+      style={{ 
+        transform: `rotate(${-spinRotation}deg)` // Negative for opposite direction
+      }}
+    >
       {ROULETTE_NUMBERS.map((num) => (
         <div 
           key={num.value}
@@ -24,7 +33,7 @@ function Lines() {
           </div>
         </div>
       ))}
-    </div>
+    </motion.div>
   )
 }
 
