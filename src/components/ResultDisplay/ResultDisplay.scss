@@ -6,6 +6,13 @@
   text-align: center;
   z-index: 10;
 
+  &__container {
+    display: flex;
+    align-items: center;
+    gap: 2rem;
+    animation: popIn 0.3s ease-out;
+  }
+
   &__number {
     font-family: 'Arial', sans-serif;
     font-size: 6rem;
@@ -13,7 +20,15 @@
     text-shadow: 
       2px 2px 4px rgba(0, 0, 0, 0.8),
       -2px -2px 4px rgba(0, 0, 0, 0.8);
-    animation: popIn 0.3s ease-out;
+  }
+
+  &__color {
+    font-family: 'Arial', sans-serif;
+    font-size: 3rem;
+    font-weight: bold;
+    text-shadow: 
+      2px 2px 4px rgba(0, 0, 0, 0.8),
+      -2px -2px 4px rgba(0, 0, 0, 0.8);
   }
 }
 
