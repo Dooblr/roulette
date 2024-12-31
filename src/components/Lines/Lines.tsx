@@ -20,7 +20,7 @@ function Lines() {
             className="lines__label"
             style={{ color: num.color === 'black' ? 'white' : num.color }}
           >
-            {num.value}
+            {num.value === -1 ? '00' : num.value}
           </div>
         </div>
       ))}

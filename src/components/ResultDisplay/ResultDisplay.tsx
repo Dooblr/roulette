@@ -12,7 +12,7 @@ function ResultDisplay() {
         className="result-display__number"
         style={{ color: currentNumber.color === 'black' ? 'white' : currentNumber.color }}
       >
-        {currentNumber.value}
+        {currentNumber.value === -1 ? '00' : currentNumber.value}
       </div>
     </div>
   )
