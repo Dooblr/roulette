@@ -20,8 +20,50 @@ interface BettingState {
 }
 
 const PAYOUT_RATIOS = {
-  single: 35, // 35 to 1 for single number
-  color: 1,   // 1 to 1 for color bets
+  single: 35,    // Single number (35:1)
+  double: 17,    // 2 numbers (17:1)
+  triple: 11,    // 3 numbers (11:1)
+  quad: 8,       // 4 numbers (8:1)
+  five: 6.5,     // 5 numbers (6.5:1)
+  six: 5,        // 6 numbers (5:1)
+  dozen: 2,      // 12 numbers (2:1)
+  half: 1,       // 18 numbers (1:1)
+  color: 1       // Red/Black (1:1)
+}
+
+const getBetType = (betNumbers: number[]): keyof typeof PAYOUT_RATIOS => {
+  const count = betNumbers.length
+  
+  switch (count) {
+    case 1:
+      return 'single'
+    case 2:
+      return 'double'
+    case 3:
+      return 'triple'
+    case 4:
+      return 'quad'
+    case 5:
+      return 'five'
+    case 6:
+      return 'six'
+    case 12:
+      return 'dozen'
+    case 18:
+      return 'half'
+    default:
+      if (isColorBet(betNumbers)) return 'color'
+      return 'single' // fallback
+  }
+}
+
+const isColorBet = (numbers: number[]): boolean => {
+  if (numbers.length === 0) return false
+  const firstNumber = numbers[0]
+  const firstColor = ROULETTE_NUMBERS.find(n => n.value === firstNumber)?.color
+  return numbers.every(num => 
+    ROULETTE_NUMBERS.find(n => n.value === num)?.color === firstColor
+  )
 }
 
 export const useBettingStore = create<BettingState>((set, get) => ({
@@ -33,7 +75,6 @@ export const useBettingStore = create<BettingState>((set, get) => ({
   placeBet: (number) => set((state) => {
     const existingBet = state.bets.find(bet => bet.number === number)
     if (existingBet) {
-      // Remove bet if clicking again
       return {
         bets: state.bets.filter(bet => bet.number !== number),
         playerMoney: state.playerMoney + existingBet.amount
@@ -55,13 +96,14 @@ export const useBettingStore = create<BettingState>((set, get) => ({
     }
   }),
   handleWin: (winningNumber) => set((state) => {
+    // Group bets by their type
+    const betNumbers = state.bets.map(bet => bet.number)
+    const betType = getBetType(betNumbers)
+    const ratio = PAYOUT_RATIOS[betType]
+
+    // Calculate winnings for matching bets
     const winningBets = state.bets.filter(bet => bet.number === winningNumber)
     const totalWinnings = winningBets.reduce((sum, bet) => {
-      const isColorBet = state.bets.some(b => 
-        ROULETTE_NUMBERS.find(n => n.value === b.number)?.color === 
-        ROULETTE_NUMBERS.find(n => n.value === winningNumber)?.color
-      )
-      const ratio = isColorBet ? PAYOUT_RATIOS.color : PAYOUT_RATIOS.single
       return sum + (bet.amount * (ratio + 1))
     }, 0)
     
