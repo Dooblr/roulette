@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { useCollision } from './hooks/useCollision'
+import { useEffect, useRef, useState } from 'react'
 import './App.scss'
-import Spinner from './components/Spinner/Spinner'
-import { useGameStore, findNumberByAngle } from './stores/gameStore'
+import { useCollision } from './hooks/useCollision'
+import { findNumberByAngle, useGameStore } from './stores/gameStore'
+import Lines from './components/Lines/Lines'
+import ResultDisplay from './components/ResultDisplay/ResultDisplay'
 
 interface Vector2D {
   x: number
@@ -38,7 +39,7 @@ function App() {
     return value * (1 + randomFactor * maxDeviation)
   }
 
-  const { setCurrentNumber } = useGameStore()
+  const { setCurrentNumber, setSpinRotation } = useGameStore()
 
   useEffect(() => {
     let frameId: number | null = null;
@@ -99,8 +100,11 @@ function App() {
         setBallPosition(newPos)
         setBallVelocity(newVel)
 
+        // Update global spin rotation
+        setSpinRotation(currentAngle)
+
         if (inwardPhase && currentRadius <= stopRadius && Math.abs(currentVelocity) < 0.1) {
-          const ballAngle = (Math.atan2(newPos.y, newPos.x) * 180 / Math.PI + 360) % 360
+          const ballAngle = ((Math.atan2(newPos.y, newPos.x) * 180 / Math.PI) + 450) % 360
           const { number: finalNumber, next, isExactlyBetween } = findNumberByAngle(ballAngle)
           
           let targetNumber = finalNumber
@@ -110,8 +114,7 @@ function App() {
           
           setCurrentNumber(targetNumber)
           
-          // Calculate bounce target to segment center
-          const targetAngle = targetNumber.angle * Math.PI / 180
+          const targetAngle = (targetNumber.angle - 90) * Math.PI / 180
           const bouncePos = {
             x: stopRadius * Math.cos(targetAngle),
             y: stopRadius * Math.sin(targetAngle)
@@ -119,6 +122,7 @@ function App() {
           setBounceTarget(bouncePos)
           
           setIsSpinning(false)
+          setSpinRotation(0)
           return
         }
 
@@ -131,7 +135,7 @@ function App() {
     return () => {
       if (frameId) cancelAnimationFrame(frameId)
     }
-  }, [isSpinning, handleCollision, stopRadius, chaosLevel, setCurrentNumber])
+  }, [isSpinning, handleCollision, stopRadius, chaosLevel, setCurrentNumber, setSpinRotation])
 
   // Add bounce animation effect
   useEffect(() => {
@@ -179,9 +183,10 @@ function App() {
 
   return (
     <div className="app-container">
-      <Spinner />
+      <ResultDisplay />
       <div className="coordinate-system">
         <div className="circle">
+          <Lines />
           <motion.div 
             ref={ballRef}
             className="ball"

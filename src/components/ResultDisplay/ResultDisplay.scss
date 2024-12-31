@@ -1,0 +1,32 @@
+.result-display {
+  position: fixed;
+  top: 5vh;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  z-index: 10;
+
+  &__number {
+    font-family: 'Arial', sans-serif;
+    font-size: 6rem;
+    font-weight: bold;
+    text-shadow: 
+      2px 2px 4px rgba(0, 0, 0, 0.8),
+      -2px -2px 4px rgba(0, 0, 0, 0.8);
+    animation: popIn 0.3s ease-out;
+  }
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.2);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+} 

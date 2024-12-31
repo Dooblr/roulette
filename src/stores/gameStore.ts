@@ -10,9 +10,11 @@ interface GameState {
   ballDirection: 1 | -1
   isSpinning: boolean
   currentNumber: RouletteNumber | null
+  spinRotation: number
   setBallDirection: (direction: 1 | -1) => void
   setIsSpinning: (spinning: boolean) => void
   setCurrentNumber: (number: RouletteNumber | null) => void
+  setSpinRotation: (rotation: number) => void
 }
 
 // Standard roulette wheel sequence with colors and positions
@@ -60,9 +62,11 @@ export const useGameStore = create<GameState>((set) => ({
   ballDirection: 1,
   isSpinning: false,
   currentNumber: null,
+  spinRotation: 0,
   setBallDirection: (direction) => set({ ballDirection: direction }),
   setIsSpinning: (spinning) => set({ isSpinning: spinning }),
-  setCurrentNumber: (number) => set({ currentNumber: number })
+  setCurrentNumber: (number) => set({ currentNumber: number }),
+  setSpinRotation: (rotation) => set({ spinRotation: rotation })
 }))
 
 // Helper function to find the closest number to a given angle
@@ -71,30 +75,26 @@ export const findNumberByAngle = (angle: number): {
   next?: RouletteNumber, 
   isExactlyBetween: boolean 
 } => {
+  // Normalize angle to 0-360 and adjust for coordinate system
   const normalizedAngle = ((angle % 360) + 360) % 360
   
-  // Find segment boundaries (each segment is 10 degrees)
-  const segmentIndex = Math.floor(normalizedAngle / 10)
-  const segmentStart = segmentIndex * 10
-  const segmentMiddle = segmentStart + 5
-  const segmentEnd = segmentStart + 10
+  // Find the closest number based on direct angle comparison
+  const sortedNumbers = [...ROULETTE_NUMBERS].sort((a, b) => {
+    const diffA = Math.abs(normalizedAngle - a.angle)
+    const diffB = Math.abs(normalizedAngle - b.angle)
+    return diffA - diffB
+  })
+
+  const closestNumber = sortedNumbers[0]
+  const nextClosest = sortedNumbers[1]
   
-  // Find numbers in current and adjacent segments
-  const currentNumber = ROULETTE_NUMBERS.find(n => 
-    Math.abs(n.angle - segmentMiddle) < 5
-  )!
-  
-  const nextSegmentMiddle = ((segmentMiddle + 10) % 360)
-  const nextNumber = ROULETTE_NUMBERS.find(n => 
-    Math.abs(n.angle - nextSegmentMiddle) < 5
-  )!
-  
-  // Check if exactly between segments
-  const isExactlyBetween = Math.abs(normalizedAngle - segmentEnd) < 0.1
+  // Check if exactly between two numbers
+  const angleDiff = Math.abs(normalizedAngle - closestNumber.angle)
+  const isExactlyBetween = angleDiff > 4.5 // Half of segment width (9 degrees)
 
   return {
-    number: currentNumber,
-    next: isExactlyBetween ? nextNumber : undefined,
+    number: closestNumber,
+    next: isExactlyBetween ? nextClosest : undefined,
     isExactlyBetween
   }
 } 
